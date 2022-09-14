@@ -25,19 +25,28 @@ class TinybirdLoggerExtension(Extension):
         handlers.append(self._log_aws_api_call)
 
     def _log_aws_api_call(self, chain, context: aws.RequestContext, response: http.Response):
-        # only invoke the handler if a service and operation is set
+        # only invoke the handler if service and operation are set, indicating a correct AWS request
         if not context.service:
             return
         if not context.operation:
             return
+
+        # ignore API calls that are made from within localstack
+        if is_internal(context):
+            return
+
+        context.service
 
         payload = {
             "timestamp": datetime.utcnow().isoformat(timespec="seconds"),
             "session_id": self.session_id,
             "service": context.service.service_name,
             "operation": context.operation.name,
+            "region": context.region,
             "status_code": response.status_code,
             "user_agent": context.request.headers.get("user-agent"),
+            "request": None,
+            "response": None,
             "err_type": context.service_exception.code if context.service_exception else None,
             "err_msg": context.service_exception.message if context.service_exception else None,
         }
@@ -46,11 +55,11 @@ class TinybirdLoggerExtension(Extension):
         try:
             payload["request"] = json.dumps(context.service_request)
         except Exception:
-            payload["request"] = ""
+            pass
         try:
             payload["response"] = json.dumps(context.service_response)
         except Exception:
-            payload["response"] = ""
+            pass
 
         response = requests.post(
             url="https://api.tinybird.co/v0/events?name=aws_api_calls",
@@ -60,3 +69,11 @@ class TinybirdLoggerExtension(Extension):
             }
         )
         print("loaded into tinybird: %s" % response.json())
+
+
+def is_internal(context: aws.RequestContext) -> bool:
+    """
+    Method to determine whether the given request was made from inside localstack.
+    """
+    from localstack.utils.aws.aws_stack import is_internal_call_context
+    return is_internal_call_context(context.request.headers)
