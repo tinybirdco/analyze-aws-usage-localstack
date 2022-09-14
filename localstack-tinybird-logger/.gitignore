@@ -1,0 +1,8 @@
+.venv/
+.idea/
+*.iml
+*~
+*.swp
+*.egg-info/
+dist/
+__pycache__/
