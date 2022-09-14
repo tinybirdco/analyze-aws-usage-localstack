@@ -25,17 +25,12 @@ class TinybirdLoggerExtension(Extension):
         handlers.append(self._log_aws_api_call)
 
     def _log_aws_api_call(self, chain, context: aws.RequestContext, response: http.Response):
-        # only invoke the handler if service and operation are set, indicating a correct AWS request
-        if not context.service:
-            return
+        # only invoke the handler if the operation is set, indicating a correct AWS request
         if not context.operation:
             return
-
         # ignore API calls that are made from within localstack
         if is_internal(context):
             return
-
-        context.service
 
         payload = {
             "timestamp": datetime.utcnow().isoformat(timespec="seconds"),
@@ -62,10 +57,11 @@ class TinybirdLoggerExtension(Extension):
             pass
 
         response = requests.post(
-            url="https://api.tinybird.co/v0/events?name=aws_api_calls",
+            url="https://api.tinybird.co/v0/events",
             data=json.dumps(payload),
-            headers={
-                "Authorization": f"Bearer {TINYBIRD_API_TOKEN}"
+            params={
+                "name": "aws_api_calls",
+                "token": TINYBIRD_API_TOKEN,
             }
         )
         print("loaded into tinybird: %s" % response.json())
