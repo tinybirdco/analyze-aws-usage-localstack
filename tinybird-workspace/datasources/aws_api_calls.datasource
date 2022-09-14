@@ -1,0 +1,15 @@
+SCHEMA >
+    `timestamp` DateTime `json:$.timestamp`,
+    `session_id` UUID `json:$.session_id`,
+    `service` LowCardinality(String) `json:$.service`,
+    `operation` String `json:$.operation`,
+    `status_code` Int16 `json:$.status_code`,
+    `user_agent` String `json:$.user_agent`,
+    `err_msg` Nullable(String) `json:$.err_msg`,
+    `err_type` Nullable(String) `json:$.err_type`,
+    `request` Nullable(String) `json:$.request`,
+    `response` Nullable(String) `json:$.response`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp, session_id"
