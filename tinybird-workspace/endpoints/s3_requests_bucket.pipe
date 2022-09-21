@@ -1,0 +1,13 @@
+NODE s3_requests_bucket_0
+SQL >
+
+    SELECT
+      t,
+      bucket,
+      countMerge(c) c
+    FROM aws_s3_api_calls
+    WHERE bucket <> ''
+    GROUP BY t, bucket
+    ORDER BY t
+
+

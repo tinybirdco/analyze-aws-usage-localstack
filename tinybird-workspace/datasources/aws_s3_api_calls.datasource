@@ -1,0 +1,12 @@
+# Data Source created from Pipe 'mv_aws_s3_api_calls'
+DESCRIPTION >
+    null
+
+SCHEMA >
+    `t` DateTime,
+    `bucket` String,
+    `c` AggregateFunction(count)
+
+ENGINE "AggregatingMergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(t)"
+ENGINE_SORTING_KEY "t, bucket"

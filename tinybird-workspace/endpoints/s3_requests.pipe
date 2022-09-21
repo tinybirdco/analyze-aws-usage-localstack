@@ -1,0 +1,20 @@
+NODE s3_requests_0
+SQL >
+
+    SELECT
+      t,
+      countMerge(c) c,
+      avg(c) OVER (ORDER BY t DESC ROWS BETWEEN 1 preceding AND 24 following) mean,
+      stddevPop(c) OVER (ORDER BY t DESC ROWS BETWEEN 1 preceding AND 24 following) sd
+    FROM aws_s3_api_calls
+    GROUP BY t
+    ORDER BY t DESC
+
+
+
+NODE s3_requests_1
+SQL >
+
+    SELECT *, if(c > mean + 3 * sd, 'nok', 'ok') status FROM s3_requests_0
+
+

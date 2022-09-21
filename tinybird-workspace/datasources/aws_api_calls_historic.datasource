@@ -1,0 +1,17 @@
+
+SCHEMA >
+    `err_msg` Nullable(String) `json:$.err_msg`,
+    `err_type` Nullable(String) `json:$.err_type`,
+    `operation` String `json:$.operation`,
+    `region` String `json:$.region`,
+    `request` String `json:$.request`,
+    `response` Nullable(String) `json:$.response`,
+    `service` String `json:$.service`,
+    `session_id` String `json:$.session_id`,
+    `status_code` Int16 `json:$.status_code`,
+    `timestamp` DateTime `json:$.timestamp`,
+    `user_agent` String `json:$.user_agent`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(timestamp)"
+ENGINE_SORTING_KEY "timestamp, session_id, status_code, user_agent"

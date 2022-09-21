@@ -1,0 +1,19 @@
+NODE mv_aws_s3_api_calls_0
+SQL >
+
+    SELECT
+        toStartOfHour(timestamp) AS t,
+        JSONExtractString(request, 'Bucket') AS bucket,
+        countState() AS c
+    FROM aws_api_calls_historic
+    WHERE service = 's3'
+    GROUP BY
+        t,
+        bucket
+
+TYPE materialized
+DATASOURCE aws_s3_api_calls
+ENGINE "AggregatingMergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(t)"
+ENGINE_SORTING_KEY "t, bucket"
+

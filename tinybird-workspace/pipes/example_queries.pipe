@@ -1,0 +1,44 @@
+NODE example_queries_0
+DESCRIPTION >
+    The number of localstack runs per day
+
+SQL >
+
+    SELECT
+      toDate(`timestamp`) as `date`,
+      countDistinct(session_id) as number_of_sessions
+    FROM aws_api_calls
+    GROUP BY `date`
+
+
+
+NODE example_queries_1
+DESCRIPTION >
+    The most used service operation
+
+SQL >
+
+    SELECT
+      service,
+      operation,
+      countDistinct(session_id) as number_of_sessions
+    FROM aws_api_calls
+    GROUP BY service, operation
+
+
+
+
+NODE example_queries_2
+DESCRIPTION >
+    De-normalize specific AWS operations
+
+SQL >
+
+    SELECT
+      timestamp,
+      operation,
+      JSONExtractString(request, 'Bucket') as bucket
+    FROM aws_api_calls
+    WHERE service == 's3'
+
+
