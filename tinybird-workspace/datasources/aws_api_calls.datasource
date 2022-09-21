@@ -3,6 +3,7 @@ SCHEMA >
     `session_id` UUID `json:$.session_id`,
     `service` LowCardinality(String) `json:$.service`,
     `operation` String `json:$.operation`,
+    `region` LowCardinality(String) `json:$.region`,
     `status_code` Int16 `json:$.status_code`,
     `user_agent` String `json:$.user_agent`,
     `err_msg` Nullable(String) `json:$.err_msg`,
